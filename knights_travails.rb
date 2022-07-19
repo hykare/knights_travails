@@ -36,27 +36,42 @@ class Board
     end
   end
 
-  def get_knight_path(start, _target)
-    # someway to store path/from which node I came to each field?
-
+  def get_knight_path(start, target)
     start_node = state[start[0]][start[1]]
+    target_node = state[target[0]][target[1]]
+
     queue = [start_node]
     visited = []
+    start_node.source = start_node
     until queue.empty?
       node = queue.shift
       visited << node
-      queue += node.neighbors - visited - queue
+      new_nodes = node.neighbors - visited - queue
+      queue += new_nodes
+      # put node as the source node of all enqueued items
+      new_nodes.each { |new_node| new_node.source = node }
+
+      next unless new_nodes.include? target_node
+
+      path = []
+      temp_node = target_node
+      until temp_node == temp_node.source
+        path.unshift temp_node
+        temp_node = temp_node.source
+      end
+      path.unshift start_node
+      return path
     end
-    visited
   end
 end
 
 class Node
-  attr_accessor :neighbors, :coordinates
+  attr_accessor :neighbors, :coordinates, :source
 
   def initialize
     @coordinates = nil
     @neighbors = []
+    @source = nil
   end
 
   def to_s
@@ -70,5 +85,5 @@ class Node
 end
 
 board = Board.new
-breadth_traversal = board.get_knight_path([1, 2], [])
+breadth_traversal = board.get_knight_path([1, 2], [4, 7])
 puts breadth_traversal
