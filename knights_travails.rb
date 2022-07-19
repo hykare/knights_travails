@@ -16,7 +16,6 @@ class Board
           start_node.neighbors << target_node
         end
       end
-      # puts "#{start_node}:\t#{start_node.neighbors_s}"
     end
   end
 
@@ -35,6 +34,20 @@ class Board
         yield node, row_no, col_no
       end
     end
+  end
+
+  def get_knight_path(start, _target)
+    # someway to store path/from which node I came to each field?
+
+    start_node = state[start[0]][start[1]]
+    queue = [start_node]
+    visited = []
+    until queue.empty?
+      node = queue.shift
+      visited << node
+      queue += node.neighbors - visited - queue
+    end
+    visited
   end
 end
 
@@ -57,4 +70,5 @@ class Node
 end
 
 board = Board.new
-puts board.state[2][1].neighbors_s
+breadth_traversal = board.get_knight_path([1, 2], [])
+puts breadth_traversal
